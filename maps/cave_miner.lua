@@ -1292,6 +1292,20 @@ local function on_player_used_capsule(event)
 		player.play_sound{path="utility/armor_insert", volume_modifier=1}		
 		refresh_gui()
 	end
+	-- Allow slowdown capsules to destroy out-of-map tiles (WIP)
+	if event.item.name == "slowdown-capsule" then
+		-- game.print("Caught slowdown-capsule throw")
+		local pos = event.position
+		local test = 12
+		local surface = game.surfaces[1]
+		local tile = surface.get_tile(pos.x,pos.y)
+		if tile.name == "out-of-map" then
+			-- game.print("found out-of-map tile")
+			surface.set_tiles({{name = "dirt-7", position = {pos.x, pos.y}}})
+			-- game.print("Replaced out of world tile tile at " .. pos.x .. "," .. pos.y)
+		end
+	end
+
 end
 
 Event.add(defines.events.on_player_used_capsule, on_player_used_capsule)
