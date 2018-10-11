@@ -1296,7 +1296,6 @@ local function on_player_used_capsule(event)
 	if event.item.name == "slowdown-capsule" then
 		-- game.print("Caught slowdown-capsule throw")
 		local pos = event.position
-		local test = 12
 		local surface = game.surfaces[1]
 		local tile = surface.get_tile(pos.x,pos.y)
 		if tile.name == "out-of-map" then
