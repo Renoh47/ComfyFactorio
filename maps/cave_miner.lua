@@ -230,7 +230,6 @@ local function treasure_chest(position, distance_to_center)
 	local chest_loot = {			
 		{{name = "steel-axe", count = math_random(1,3)}, weight = 2, evolution_min = 0.0, evolution_max = 0.5},
 		{{name = "submachine-gun", count = math_random(1,3)}, weight = 3, evolution_min = 0.0, evolution_max = 0.1},		
-		{{name = "slowdown-capsule", count = math_random(16,32)}, weight = 1, evolution_min = 0.3, evolution_max = 0.7},
 		{{name = "poison-capsule", count = math_random(16,32)}, weight = 3, evolution_min = 0.3, evolution_max = 1},		
 		{{name = "uranium-cannon-shell", count = math_random(16,32)}, weight = 5, evolution_min = 0.6, evolution_max = 1},
 		{{name = "cannon-shell", count = math_random(16,32)}, weight = 5, evolution_min = 0.4, evolution_max = 0.7},
@@ -262,6 +261,7 @@ local function treasure_chest(position, distance_to_center)
 		{{name = "modular-armor", count = 1}, weight = 2, evolution_min = 0.2, evolution_max = 0.6},
 		{{name = "power-armor", count = 1}, weight = 2, evolution_min = 0.4, evolution_max = 1},
 		{{name = "power-armor-mk2", count = 1}, weight = 1, evolution_min = 0.9, evolution_max = 1},
+		{{name = "slowdown-capsule", count = math_random(2,8)}, weight = 1, evolution_min = 0.5, evolution_max = 1},
 		{{name = "battery-equipment", count = 1}, weight = 2, evolution_min = 0.3, evolution_max = 0.7},
 		{{name = "battery-mk2-equipment", count = 1}, weight = 2, evolution_min = 0.6, evolution_max = 1},
 		{{name = "belt-immunity-equipment", count = 1}, weight = 1, evolution_min = 0.3, evolution_max = 1},
@@ -416,6 +416,7 @@ function rare_treasure_chest(position)
 	table.insert(rare_treasure_chest_loot_weights, {{name = 'distractor-capsule', count = math.random(4,8)},4})
 	table.insert(rare_treasure_chest_loot_weights, {{name = 'destroyer-capsule', count = math.random(4,8)},3})
 	table.insert(rare_treasure_chest_loot_weights, {{name = 'atomic-bomb', count = 1},1})		
+	table.insert(rare_treasure_chest_loot_weights, {{name = "slowdown-capsule", count = math_random(4,8)},3})
 	for _, t in pairs (rare_treasure_chest_loot_weights) do
 		for x = 1, t[2], 1 do
 			table.insert(rare_treasure_chest_raffle_table, t[1])
@@ -463,7 +464,8 @@ local function secret_shop(pos)
     {price = {{"raw-fish", math.random(2,4)}}, offer = {type = 'give-item', item = 'railgun-dart'}},
 	{price = {{"raw-fish", math.random(100,175)}}, offer = {type = 'give-item', item = 'loader'}},
 	{price = {{"raw-fish", math.random(200,350)}}, offer = {type = 'give-item', item = 'fast-loader'}},
-	{price = {{"raw-fish", math.random(400,600)}}, offer = {type = 'give-item', item = 'express-loader'}}
+	{price = {{"raw-fish", math.random(400,600)}}, offer = {type = 'give-item', item = 'express-loader'}},
+	{price = {{"raw-fish", math.random(1000,2000)}}, offer = {type = 'give-item', item = 'slowdown-capsule'}}
 	}
 	local surface = game.surfaces[1]										
 	local market = surface.create_entity {name = "market", position = pos}
@@ -813,6 +815,10 @@ local function hunger_update(player, food_value)
 	player.character.character_mining_speed_modifier  = player_hunger_buff[global.player_hunger[player.name]]
 end
 
+function disable_recipes()
+	game.forces.player.recipes["slowdown-capsule"].enabled = false
+end
+
 local function on_player_joined_game(event)
 	local surface = game.surfaces[1]	
 	local player = game.players[event.player_index]
@@ -841,6 +847,9 @@ reinforcing your pickaxe as well as increasing the size of your backpack.
 Breaking rocks is exhausting and might make you hungry.
 So don´t forget to eat some fish once in a while to stay well fed.
 But be careful, eating too much might have it´s consequences too.
+
+Slowdown capsules can be used to remove the void, but they are very rare
+and unable to be crafted. Use sparingly.
 
 Darkness is a hazard in the mines, stay near your lamps..
 ]]
@@ -902,6 +911,7 @@ Darkness is a hazard in the mines, stay near your lamps..
 	end
 	create_cave_miner_button(player)
 	create_cave_miner_stats_gui(player)
+	disable_recipes()
 end
 
 local function spawn_cave_inhabitant(pos, target_position)
@@ -1301,7 +1311,7 @@ local function on_player_used_capsule(event)
 		if tile.name == "out-of-map" then
 			-- game.print("found out-of-map tile")
 			surface.set_tiles({{name = "dirt-7", position = {pos.x, pos.y}}})
-			-- game.print("Replaced out of world tile tile at " .. pos.x .. "," .. pos.y)
+			-- game.print("Replaced out of map tile at " .. pos.x .. "," .. pos.y)
 		end
 	end
 
